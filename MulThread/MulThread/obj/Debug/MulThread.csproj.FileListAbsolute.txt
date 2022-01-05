@@ -1,0 +1,9 @@
+D:\临时调试\MulThread\MulThread\bin\Debug\MulThread.exe.config
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.csprojResolveAssemblyReference.cache
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.MainForm.resources
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.Properties.Resources.resources
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.csproj.GenerateResource.Cache
+D:\临时调试\MulThread\MulThread\bin\Debug\MulThread.exe
+D:\临时调试\MulThread\MulThread\bin\Debug\MulThread.pdb
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.exe
+D:\临时调试\MulThread\MulThread\obj\Debug\MulThread.pdb
