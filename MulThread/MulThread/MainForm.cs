@@ -23,6 +23,7 @@ namespace MulThread
             _TaskData = new TaskData();
             _TaskData.A_UpdateData += HandleDataUpdate;
             _TaskData.A_CountChange += HandleCountChange;
+            _TaskData.A_TaskFinish += HandleTaskFin;
         }
 
         private void AddBtn_Click(object sender, EventArgs e)
@@ -75,6 +76,14 @@ namespace MulThread
                 }
             }));
         }
+
+        private void HandleTaskFin()
+        {
+            this.Invoke(new Action(() =>
+            {
+                this.Close();
+            }));
+        }
         private void AddNewItem(ListViewItem ViewItem,TaskItem DataItem)
         {
             ViewItem.SubItems.Add(DataItem.state.ToString());
@@ -101,9 +110,17 @@ namespace MulThread
                     e.Cancel = true;
                     return;
                 }
+                else if (!bStop)
+                {
+                    this.Enabled = false;
+                    bStop = true;
+                    _TaskData.Stop();
+                    e.Cancel = true;
+                }
+                else { }
             }
-            _TaskData.Stop();
-            bStop = true;
+            else { }
+            
         }
     }
 }

@@ -41,10 +41,13 @@ namespace MulThread
         #endregion 
         public Action<TaskItem> A_UpdateData;
         public Action<int> A_CountChange;
+        public Action A_TaskFinish;
         private object _obLock = new object();
+        private object _obLockForFinTask = new object();
         private Semaphore RunSem = new Semaphore(MaxOnline, MaxOnline);
         private int _CurCount = 0;
         private List<TaskItem> LItems = new List<TaskItem>();
+        private List<Task> LTasks = new List<Task>();
         private CancellationTokenSource _TaskToken = new CancellationTokenSource();
         public int CurCount { get { return _CurCount; } }
        
@@ -86,25 +89,45 @@ namespace MulThread
         public bool AddTask(TaskItem ArgItem)
         {
             bool ret = true;
+            Task tmpTask = null;
             lock (_obLock)
             {
                 if (CurCount < (MaxOnline + MaxWait))
                 {
                     _CurCount++;
                     LItems.Add(ArgItem);
-                    Task.Factory.StartNew(new Action<object>(RunTask), ArgItem);
-                   // ThreadPool.QueueUserWorkItem(RunTask, ArgItem);
+                    tmpTask = Task.Factory.StartNew(new Action<object>(RunTask), ArgItem);
+                    tmpTask.ContinueWith(new Action<Task>(RemoveFinTask));
                     if (A_CountChange != null)
                         A_CountChange(_CurCount);
                 }
                 else
                     ret = false;
             }
+            if (tmpTask!=null)
+            {
+                lock (_obLockForFinTask)
+                {
+                    LTasks.Add(tmpTask);
+                }
+            }
             return ret;
+        }
+        private void RemoveFinTask(Task ArgTask)
+        {
+            lock (_obLockForFinTask)
+            {
+                LTasks.Remove(ArgTask);
+            }
         }
         public void Stop()
         {
-            _TaskToken.Cancel();
+            Task.Factory.StartNew(new Action(() => {
+                _TaskToken.Cancel();
+                Task.WaitAll(LTasks.ToArray());
+                if (A_TaskFinish != null)
+                    A_TaskFinish();
+            }));
         }
     }
 }
